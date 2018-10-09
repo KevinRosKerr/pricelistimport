@@ -5,8 +5,10 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.poi.EncryptedDocumentException;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,6 +22,7 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 public class Excel {
 	public static final String PriceListFile = "./src/Pricelist.xlsx";
 	private static Workbook workbook;
+	Database DBC = new Database();
 
 	public Excel() throws EncryptedDocumentException, IOException {
 		// TODO Auto-generated constructor stub
@@ -45,10 +48,13 @@ public class Excel {
 	
 	
 	private void readContents(Sheet sheet) {
+		
 		System.out.println("reading...");
+		System.out.println("Total No.of records: "+ (sheet.getPhysicalNumberOfRows() - 1)); 
+		String datacolumn[][] = new String[sheet.getPhysicalNumberOfRows()][8];
+		
 		int rowcount = 0;
 		int cellcount = 0;
-		DataFormatter dataFormatter = new DataFormatter();
 		Iterator<Row> rowIterator = sheet.rowIterator();
         while (rowIterator.hasNext()) {
             Row row = rowIterator.next();
@@ -59,17 +65,20 @@ public class Excel {
             while (cellIterator.hasNext()) {
                 Cell cell = cellIterator.next();
                if(cellcount == 4 || cellcount == 5) {
-            	   getdatefromcell(cell.toString());
+            	   datacolumn[rowcount][cellcount] = getdatefromcell(cell.toString(),cellcount);
+            	   //System.out.print(getdatefromcell(cell.toString(),cellcount) +"\t");
                }
                else {
                if(cell.getCellType() == CellType.FORMULA) {
             	   switch(cell.getCachedFormulaResultType()) {
             	   case NUMERIC:
-            		   System.out.print(cell.getNumericCellValue() + "\t");
+            		   datacolumn[rowcount][cellcount] = String.valueOf(cell.getNumericCellValue());
+            		 //  System.out.print(cell.getNumericCellValue() + "\t");
             		   break;
             	   case ERROR:
             		   if(cell.getErrorCellValue() == 7) {
-            			   System.out.print(0 + "\t");
+            			   datacolumn[rowcount][cellcount] = "0";
+            			//   System.out.print(0 + "\t");
             		   }
             		   break;
 				   default:
@@ -77,43 +86,50 @@ public class Excel {
 					   break;
             	   	}      	   
                }else {
-            	   if(cell.getCellType() == CellType.FORMULA && cell.getNumericCellValue() < 0) {
-            		   System.out.print(0 + "\t"); 
-            	   }
- 
-                System.out.print(cell + "\t"); 
+            	datacolumn[rowcount][cellcount] = String.valueOf(cell);   
+               // System.out.print(cell + "\t"); 
                }
-              cellcount++;
             }
+               cellcount++;
             }
-            System.out.println();
         }
             //insert/update DB based on current row
             rowcount++;
-        }
-        
-       //convertdate();
+        } 
+        testlist(datacolumn);
 	}
 	
-	
-	private String convertdate() {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-		LocalDateTime currentDate = LocalDateTime.now();
-		System.out.println(dtf.format(currentDate));
-		return null;
-	}
-	
-	private void getdatefromcell(String filedate) {
+	private String getdatefromcell(String filedate,int datecolumn) {
 		String dateinstring = filedate;	
+		LocalDateTime localdate = null;
 		if(!dateinstring.isEmpty()) {
-		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
-		LocalDate localdate = LocalDate.parse(dateinstring, dtf);
-		System.out.print(localdate.format(dtf.ofPattern("dd/MM/yyyy \t")));
+		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
+		switch(datecolumn) {
+		case 4:
+			localdate = LocalDateTime.parse(dateinstring + " 00:00:00", dtf);
+			break;
+		case 5:
+			localdate = LocalDateTime.parse(dateinstring + " 23:59:59", dtf);
+			break;
+		}
+		//System.out.print(localdate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy \t")));
+		return localdate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		
 		}else {
 			System.out.print("empty space \t");
-		}
+			return null;
+		}	
+	}
 	
-		 
+	private void testlist(String datacolumn[][]) {
+		System.out.println("reading list:");
+		for (int i = 1; i< datacolumn.length; i++) {
+			for(int j = 0; j< 6; j++) {
+				System.out.print(datacolumn[i][j].toString() + "\t");
+			}
+			System.out.println("");
+		}
+		
 	}
 
 }
