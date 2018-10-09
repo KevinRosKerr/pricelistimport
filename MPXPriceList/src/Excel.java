@@ -96,9 +96,79 @@ public class Excel {
             //insert/update DB based on current row
             rowcount++;
         } 
-        testlist(datacolumn);
+        testlist(datacolumn, sheet.getSheetName().toString());
 	}
 	
+	private void testlist(String[][] datacolumn, String sheetname) {
+			System.out.println("reading list:");
+			for (int i = 1; i< datacolumn.length; i++) {
+				for(int j = 0; j< 6; j++) {
+					System.out.print(datacolumn[i][j].toString() + "\t");
+				}
+				System.out.println("");
+			}
+			
+			LocalDateTime nowtime = LocalDateTime.now();
+			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			//System.out.println(localdate);
+			LocalDateTime formattedstartdate = LocalDateTime.parse(datacolumn[1][4], dtf);
+			
+			dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+			//LocalDateTime updateEndDate = LocalDateTime.parse(offerstartdate, dtf);
+			//String updateEndDate1 = LocalDateTime.parse(updateEndDate.minusDays(1), dtf)+" 23:59:59";
+			
+			if(formattedstartdate.isBefore(nowtime)) {
+				//Update Price end date Now
+				System.out.println("test");
+				if(sheetname.contains("Pricing")) {
+					DBC.UpdatePricing((int) Math.round((Double.valueOf(datacolumn[1][1]))));
+				} else if(sheetname.contains("Holdback")) {
+					DBC.UpdateHoldback((int) Math.round((Double.valueOf(datacolumn[1][1]))));
+				}
+			}else {
+				//update price end date in the future
+				if(sheetname.contains("Pricing")) {
+					//TO-DO
+						}
+				else if(sheetname.contains("Holdback")) {
+					//TO-DO
+				}
+			}
+			for (int i = 1; i< datacolumn.length; i++) {
+				int contactchannelid = (int) Math.round((Double.valueOf(datacolumn[i][1])));
+				int phonemodelid = (int) Math.round((Double.valueOf(datacolumn[i][2])));
+				int price = (int) Math.round((Double.valueOf(datacolumn[i][3])));
+				String offerstartdate = datacolumn[i][4];
+				String offerenddate = datacolumn[i][5];
+				System.out.println("ccid: " +contactchannelid);
+				System.out.println("phonemodelid: "+ phonemodelid);
+				System.out.println("price: "+ price);
+				System.out.println("start date: "+offerstartdate);
+				System.out.println("end date: " + offerenddate);
+				System.out.println();
+				
+				
+				if(formattedstartdate.isBefore(nowtime)) {
+					//Change Prices Now
+					System.out.println("test");
+					if(sheetname.contains("Pricing")) {
+						DBC.CurrentPricingInsertQuery(contactchannelid, phonemodelid, offerenddate, price);
+					} else if(sheetname.contains("Holdback")) {
+						DBC.CurrentHoldbackInsertQuery(contactchannelid, phonemodelid, offerenddate, price);
+					}
+				}else {
+					//change future prices
+					if(sheetname.contains("Pricing")) {
+						DBC.FuturePricingInsertQuery(contactchannelid, phonemodelid, offerstartdate, offerenddate, price);
+							}
+					else if(sheetname.contains("Holdback")) {
+						DBC.FutureHoldbackInsertQuery(contactchannelid, phonemodelid, offerstartdate, offerenddate, price);
+					}
+				}
+			}
+	}
+							
+
 	private String getdatefromcell(String filedate,int datecolumn) {
 		String dateinstring = filedate;	
 		LocalDateTime localdate = null;
@@ -121,15 +191,7 @@ public class Excel {
 		}	
 	}
 	
-	private void testlist(String datacolumn[][]) {
-		System.out.println("reading list:");
-		for (int i = 1; i< datacolumn.length; i++) {
-			for(int j = 0; j< 6; j++) {
-				System.out.print(datacolumn[i][j].toString() + "\t");
-			}
-			System.out.println("");
-		}
 		
-	}
-
 }
+
+

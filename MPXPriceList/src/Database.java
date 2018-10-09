@@ -25,7 +25,8 @@ public class Database {
 				
 	}
 	
-	private void UpdatePricing(int contactchannelid) {
+	//change prices now
+	public void UpdatePricing(int contactchannelid) {
 		String updatequery = "UPDATE PPO SET offerenddate = GETDATE() FROM [dbo].t_PhonePriceOverride PPO	WHERE ContactChannelID in (?)	and OfferEndDate >= GETDATE() and ([Comments] NOT like '%AUTO CREATED%' or comments is null)";
 		try {
 			PreparedStatement preparedStmt = con.prepareStatement(updatequery);
@@ -37,7 +38,8 @@ public class Database {
 		}
 	}
 	
-	private void UpdateHoldback(int contactchannelid) {
+	//change Holdback now
+	public void UpdateHoldback(int contactchannelid) {
 		String updatequery = "UPDATE t_ModelHoldback set ValidTo = GETDATE() where ContactChannelID in (?) and ValidTo >= GETDATE() ";
 		try {
 			PreparedStatement preparedStmt = con.prepareStatement(updatequery);
@@ -49,7 +51,8 @@ public class Database {
 		}
 	}
 	
-	private void UpdatePricing(int contactchannelid,String enddate) {
+	//future prices
+	public void UpdatePricing(int contactchannelid,String enddate) {
 		String updatequery = "UPDATE PPO SET offerenddate = GETDATE() FROM [dbo].t_PhonePriceOverride PPO	WHERE ContactChannelID in (?)	and OfferEndDate >= '?' and ([Comments] NOT like '%AUTO CREATED%' or comments is null)";
 		try {
 			PreparedStatement preparedStmt = con.prepareStatement(updatequery);
@@ -63,7 +66,8 @@ public class Database {
 		}
 	}
 	
-	private void UpdateHoldback(int contactchannelid, String enddate) {
+	//future holdback
+	public void UpdateHoldback(int contactchannelid, String enddate) {
 		String updatequery = "UPDATE t_ModelHoldback set ValidTo = ? where ContactChannelID in (?) and ValidTo >= ? ";
 		try {
 			PreparedStatement preparedStmt = con.prepareStatement(updatequery);
