@@ -20,12 +20,13 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 public class Excel {
-	public static final String PriceListFile = "./src/Pricelist.xlsx";
+	public static  String PriceListFile;
 	private static Workbook workbook;
 	Database DBC = new Database();
 
-	public Excel() throws EncryptedDocumentException, IOException {
+	public Excel(String excelfile) throws EncryptedDocumentException, IOException {
 		// TODO Auto-generated constructor stub
+		PriceListFile = excelfile;
 		workbook = WorkbookFactory.create(new File(PriceListFile));
 		System.out.println("Workbook has " + workbook.getNumberOfSheets() + " sheets: ");
 
