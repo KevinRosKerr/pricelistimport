@@ -53,7 +53,7 @@ public class Database {
 	
 	//future prices
 	public void UpdatePricing(int contactchannelid,String enddate) {
-		String updatequery = "UPDATE PPO SET offerenddate = GETDATE() FROM [dbo].t_PhonePriceOverride PPO	WHERE ContactChannelID in (?)	and OfferEndDate >= '?' and ([Comments] NOT like '%AUTO CREATED%' or comments is null)";
+		String updatequery = "UPDATE PPO SET offerenddate = ? FROM [dbo].t_PhonePriceOverride PPO	WHERE ContactChannelID in (?)	and OfferEndDate >= ? and ([Comments] NOT like '%AUTO CREATED%' or comments is null)";
 		try {
 			PreparedStatement preparedStmt = con.prepareStatement(updatequery);
 			preparedStmt.setString(1, enddate);

@@ -110,12 +110,13 @@ public class Excel {
 			
 			LocalDateTime nowtime = LocalDateTime.now();
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			//System.out.println(localdate);
 			LocalDateTime formattedstartdate = LocalDateTime.parse(datacolumn[1][4], dtf);
 			
-			dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-			//LocalDateTime updateEndDate = LocalDateTime.parse(offerstartdate, dtf);
-			//String updateEndDate1 = LocalDateTime.parse(updateEndDate.minusDays(1), dtf)+" 23:59:59";
+			
+			LocalDateTime updateEndDate = LocalDateTime.parse(datacolumn[1][4], dtf);
+			updateEndDate = updateEndDate.minusDays(1);
+			updateEndDate = updateEndDate.plusHours(23).plusMinutes(59).plusSeconds(59);
+			String updateEndDate1 = updateEndDate.format(dtf);
 			
 			if(formattedstartdate.isBefore(nowtime)) {
 				//Update Price end date Now
@@ -129,9 +130,10 @@ public class Excel {
 				//update price end date in the future
 				if(sheetname.contains("Pricing")) {
 					//TO-DO
+					DBC.UpdatePricing((int) Math.round((Double.valueOf(datacolumn[1][1]))),updateEndDate1);
 						}
 				else if(sheetname.contains("Holdback")) {
-					//TO-DO
+					DBC.UpdateHoldback((int) Math.round((Double.valueOf(datacolumn[1][1]))),updateEndDate1);
 				}
 			}
 			for (int i = 1; i< datacolumn.length; i++) {
